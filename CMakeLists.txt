@@ -23,12 +23,17 @@ if(MSVC AND _VCPKG_INSTALLED_DIR)
 endif()
 
 find_package(mc_rtc REQUIRED)
+find_package(mc_mujoco QUIET)
 
 # Locate the triorb description package (provides urdf/triorb.urdf). This sets
 # the MC_TRIORB_DESCRIPTION_PATH variable.
 find_description_package(mc_triorb_description REQUIRED)
 
 add_subdirectory(src)
+
+if(mc_mujoco_FOUND)
+  add_subdirectory(mujoco_description)
+endif()
 
 if(BUILD_TESTING)
   add_subdirectory(tests)

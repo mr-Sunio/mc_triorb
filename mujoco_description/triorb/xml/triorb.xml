@@ -1,0 +1,112 @@
+<mujoco model="call_m">
+  <compiler angle="radian" autolimits="true"/>
+
+  <option integrator="implicitfast" timestep="0.0002"/>
+
+  <default>
+    <!-- Visual Defaults (Group 1, No Collision) -->
+    <default class="visual">
+      <geom group="1" contype="0" conaffinity="0"/>
+    </default>
+    <!-- Collision Defaults (Group 3 / Physical Contact) -->
+    <default class="collision">
+      <geom group="3" contype="1" conaffinity="1"/>
+    </default>
+    <!-- Wheel Specific: low friction for omnidirectional planar motion -->
+    <default class="wheel_collision">
+      <geom group="3" type="sphere" size="0.05" contype="0" conaffinity="0" friction="0.1 0.005 0.0001"/>
+    </default>
+  </default>
+
+  <worldbody>
+    <light name="top" pos="0 0 2" mode="trackcom"/>
+
+    <!-- Elevate root body so lowest contact point (-0.47m) rests at Z = 0 -->
+    <body name="call_m" pos="0 0 0">
+      <!-- 3-DOF Planar Mobile Base Virtual Joints -->
+      <joint name="base_x" type="slide" axis="1 0 0"/>
+      <joint name="base_y" type="slide" axis="0 1 0"/>
+      <joint name="base_yaw" axis="0 0 1"/>
+
+      <body name="call_m_base/base_link" pos="0 0 0.47">
+        <!-- Upper Base Body (0.5 x 0.5 x 0.38 m) -->
+        <inertial mass="15" pos="0 0 0" diaginertia="0.6573 0.6573 0.8333"/>
+        <geom name="base_visual" class="visual" type="box" size="0.25 0.25 0.19" rgba="0 0 1 1"/>
+        <geom name="base_collision" class="collision" type="box" size="0.25 0.25 0.19"/>
+
+        <!-- Mounting / Attachment Sites Matching URDF Frames -->
+        <site name="arm_link" pos="0 0 0.19" size="0.005" rgba="0 1 0 1"/>
+        <site name="front_link" pos="0.25 0 0" size="0.002"/>
+        <site name="rear_link" pos="-0.25 0 0" size="0.002"/>
+        <site name="left_link" pos="0 0.25 0" size="0.002"/>
+        <site name="right_link" pos="0 -0.25 0" size="0.002"/>
+
+        <!-- 4 Spherical Wheels (Radius 0.05 m at Z = -0.42 m) -->
+        <body name="call_m_base/call_m_front_right_wheel" pos="-0.15 0.15 -0.42">
+          <inertial mass="1.0" pos="0 0 0" diaginertia="0.01 0.01 0.01"/>
+          <geom class="visual" type="sphere" size="0.05" rgba="0 0 1 1"/>
+          <geom class="wheel_collision"/>
+        </body>
+
+        <body name="call_m_base/call_m_front_left_wheel" pos="0.15 0.15 -0.42">
+          <inertial mass="1.0" pos="0 0 0" diaginertia="0.01 0.01 0.01"/>
+          <geom class="visual" type="sphere" size="0.05" rgba="0 0 1 1"/>
+          <geom class="wheel_collision"/>
+        </body>
+
+        <body name="call_m_base/call_m_back_right_wheel" pos="-0.15 -0.15 -0.42">
+          <inertial mass="1.0" pos="0 0 0" diaginertia="0.01 0.01 0.01"/>
+          <geom class="visual" type="sphere" size="0.05" rgba="0 0 1 1"/>
+          <geom class="wheel_collision"/>
+        </body>
+
+        <body name="call_m_base/call_m_back_left_wheel" pos="0.15 -0.15 -0.42">
+          <inertial mass="1.0" pos="0 0 0" diaginertia="0.01 0.01 0.01"/>
+          <geom class="visual" type="sphere" size="0.05" rgba="0 0 1 1"/>
+          <geom class="wheel_collision"/>
+        </body>
+
+        <!-- Lower Base Chassis (0.5 x 0.5 x 0.15 m at Z = -0.35 m) -->
+        <body name="call_m_triorb/base_link" pos="0 0 -0.35">
+          <inertial mass="10" pos="0 0 0" diaginertia="0.227 0.227 0.417"/>
+          <geom name="wheel_base_visual" class="visual" type="box" size="0.25 0.25 0.075" rgba="0.5 0.5 0.5 1"/>
+          <geom name="wheel_base_collision" class="collision" type="box" size="0.25 0.25 0.075"/>
+
+          <!-- Lidars Attached to Lower Base Chassis -->
+          <body name="call_m_lidar/back/base_link" pos="-0.22 0.22 0.1" quat="0.92388 0 0 -0.38268">
+            <inertial mass="1.0" pos="0 0 0" diaginertia="0.01 0.01 0.01"/>
+            <geom class="visual" type="cylinder" size="0.025 0.025" rgba="1 0 0 1"/>
+            <geom class="collision" type="cylinder" size="0.025 0.025"/>
+            <site name="lidar_back_site" size="0.002"/>
+          </body>
+
+          <body name="call_m_lidar/front/base_link" pos="0.22 -0.22 0.1" quat="0.38566 0 0 0.92264">
+            <inertial mass="1.0" pos="0 0 0" diaginertia="0.01 0.01 0.01"/>
+            <geom class="visual" type="cylinder" size="0.025 0.025" rgba="1 0 0 1"/>
+            <geom class="collision" type="cylinder" size="0.025 0.025"/>
+            <site name="lidar_front_site" size="0.002"/>
+          </body>
+
+          <body name="call_m_lidar/merged/base_link" pos="0 0 0.1">
+            <inertial mass="1.0" pos="0 0 0" diaginertia="0.01 0.01 0.01"/>
+            <geom class="visual" type="cylinder" size="0.025 0.025" rgba="1 0 0 1"/>
+            <geom class="collision" type="cylinder" size="0.025 0.025"/>
+            <site name="lidar_merged_site" size="0.002"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- <actuator>
+    <motor name="base_x_motor" joint="base_x" gear="100" forcerange="-1000 1000"/>
+    <motor name="base_y_motor" joint="base_y" gear="100" forcerange="-1000 1000"/>
+    <motor name="base_yaw_motor" joint="base_yaw" gear="100" forcerange="-500 500"/>
+  </actuator> -->
+  <actuator>
+    <!-- Velocity servos directly track mc_rtc velocity output -->
+    <velocity name="base_x_motor" joint="base_x" kv="1000" forcerange="-2000 2000"/>
+    <velocity name="base_y_motor" joint="base_y" kv="1000" forcerange="-2000 2000"/>
+    <velocity name="base_yaw_motor" joint="base_yaw" kv="500" forcerange="-1000 1000"/>
+  </actuator>
+</mujoco>
